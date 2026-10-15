@@ -8,31 +8,32 @@
 //
 // Usa imports relativos (ej. "../../student/entities/student.entity"), no "src/...":
 
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "../../user/entities/user.entity";
 
 // Jest no resuelve el alias "src/" y el test de Student dejaría de correr.
 @Entity()
 export class Program {
 
     @PrimaryGeneratedColumn("uuid")
-    id: string;
+    id!: string;
 
     @Column({
         type: "text",
         unique: true
     })
-    name: string;
+    name!: string;
 
     @Column({
         type: "text",
-        nullable: true
+        unique: true
     })
-    code: string;
+    code!: string;
 
-    @Column({
-        type: "text",
-        nullable: true
-    })
-    credits: number;
+    @Column({ type: "int" })
+    credits!: number;
+
+    @ManyToOne(() => User, { nullable: false })
+    createdBy!: User;
 
 }

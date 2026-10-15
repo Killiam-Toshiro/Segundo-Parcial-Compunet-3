@@ -18,6 +18,5 @@ export class CreateProgramDto {
 
     @IsInt()
     @Min(1)
-    @Max(50)
     credits!: number;
 }

@@ -5,6 +5,7 @@ import { isUUID } from 'class-validator';
 import { Program } from './entities/program.entity';
 import { User } from '../user/entities/user.entity';
 import { CreateProgramDto } from './dto/create-program.dto';
+import { PaginationDto } from '../student/dto/pagination.dto';
 
 
 
@@ -28,8 +29,11 @@ export class ProgramService {
     async create(createProgramDto: CreateProgramDto, user: User){
         try{
             const program = this.programRepository.create({
-
-            })
+                ...createProgramDto,
+                createdBy: user
+            });
+            await this.programRepository.save(program);
+            return program;
         }catch(error){
             this.handleException(error);
         }
@@ -49,6 +53,7 @@ export class ProgramService {
 
     // TODO Reto 2: findOne(id) -> programa con sus estudiantes, 404 si no existe
 
+    
     // TODO Reto 2: assignStudents(id, assignStudentsDto) -> AGREGA estudiantes al programa
     //   dentro de una transacción (QueryRunner), conservando los que ya tenía.
     //   Mismo patrón del update de estudiantes corregido en clase (combinar las notas):
