@@ -3,6 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { Program } from './entities/program.entity';
+import { User } from '../user/entities/user.entity';
+import { CreateProgramDto } from './dto/create-program.dto';
+
+
 
 
 
@@ -14,13 +18,32 @@ export class ProgramService {
     // TODO Reto 1: inyecta el repositorio de Program (y lo que necesites para las transacciones)
     constructor(
         @InjectRepository(Program)
-        private readonly clubRepository: Repository<Program>,
+        private readonly programRepository: Repository<Program>,
         private readonly datasource: DataSource
 
     ){}
 
     // TODO Reto 1: create(createProgramDto, user) -> guarda el programa
     //   - nombre o código repetido -> 409 Conflict (no 500)
+    async create(createProgramDto: CreateProgramDto, user: User){
+        try{
+            const program = this.programRepository.create({
+
+            })
+        }catch(error){
+            this.handleException(error);
+        }
+    }
+
+    private handleException(error: any): never{
+        if(error instanceof HttpException) throw error;
+
+        if(error.code === '23505')
+            throw new ConflictException(error.detail);
+
+        this.logger.error(error);
+        throw new InternalServerErrorException('Unexpected error, check server logs');
+    }
 
     // TODO Reto 1: findAll(paginationDto) -> lista paginada (limit / skip)
 
