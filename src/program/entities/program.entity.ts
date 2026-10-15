@@ -8,8 +8,10 @@
 //
 // Usa imports relativos (ej. "../../student/entities/student.entity"), no "src/...":
 
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
+import { Student } from "../../student/entities/student.entity";
+
 
 // Jest no resuelve el alias "src/" y el test de Student dejaría de correr.
 @Entity()
@@ -35,5 +37,8 @@ export class Program {
 
     @ManyToOne(() => User, { nullable: false })
     createdBy!: User;
+
+    @OneToMany(() => Student, (student) => student.program)
+    students?: Student[];
 
 }

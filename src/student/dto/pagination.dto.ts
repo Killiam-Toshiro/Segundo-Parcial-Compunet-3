@@ -11,7 +11,6 @@ export class PaginationDto{
 
     @ApiPropertyOptional({ example: 1, description: "Number of students to skip", minimum: 1 })
     @IsOptional()
-    @IsPositive()
     @Type(()=> Number)
     @Min(0)
     skip:number;
