@@ -9,6 +9,7 @@ import { ValidRoles } from '../user/enums/valid-roles.enum';
 import { User } from '../user/entities/user.entity';
 import { AssignStudentsDto } from './dto/assign-students.dto';
 import { PaginationDto } from '../student/dto/pagination.dto';
+import { BulkCreateProgramDto } from './dto/bulk-create-program.dto';
 
 
 @ApiTags('Programs')
@@ -43,5 +44,12 @@ export class ProgramController {
   }
 
   // TODO Reto 3: POST   /api/program/bulk          -> crear programas en lote (todo o nada)
-  // TODO Reto 4: proteger los POST y el PATCH para que solo un admin pueda usarlos
+
+  @Post('bulk')
+  @Auth(ValidRoles.admin)
+  bulkCreate(@Body() bulkCreateProgramDto: BulkCreateProgramDto, @GetUser() user: User) {
+    return this.programService.bulkCreate(bulkCreateProgramDto, user);
+  }
+
+  // TODO Reto 4: proteger los POST y el PATCH para que solo un admin pueda usarlos: LISTOOOOOOO YEIIIII
 }

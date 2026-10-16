@@ -7,6 +7,7 @@ import { CreateProgramDto } from './dto/create-program.dto';
 import { PaginationDto } from '../student/dto/pagination.dto';
 import { AssignStudentsDto } from './dto/assign-students.dto';
 import { Student } from '../student/entities/student.entity';
+import { BulkCreateProgramDto } from './dto/bulk-create-program.dto';
 
 
 
@@ -39,6 +40,28 @@ export class ProgramService {
             this.handleException(error);
         }
     }
+
+    /*
+    async createMany(createClubsDto: CreateClubsDto, user: User){
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try{
+            const clubs = createClubsDto.clubs.map(club =>
+                this.clubRepository.create({ ...club, createdBy: user })
+            );
+            await queryRunner.manager.save(Club, clubs);
+            await queryRunner.commitTransaction();
+            return clubs;
+        }catch(error){
+            await queryRunner.rollbackTransaction();
+            this.handleException(error);
+        }finally{
+            await queryRunner.release();
+        }
+    }
+        */
 
     private handleException(error: any): never{
         if(error instanceof HttpException) throw error;
@@ -122,4 +145,29 @@ export class ProgramService {
 
     // TODO Reto 3: bulkCreate(bulkCreateProgramDto, user) -> crea todos los programas o ninguno
     //   (transacción). Cualquier nombre/código repetido -> 409 y rollback.
+    async bulkCreate(bulkCreateProgramDto: BulkCreateProgramDto, user: User): Promise<Program[]>{
+        const queryRunner = this.datasource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try{
+            const programs = bulkCreateProgramDto.programs.map((programDto) =>
+                queryRunner.manager.create(Program, {
+                    ...programDto,
+                    createdBy: user
+                })
+            );
+
+            await queryRunner.manager.save(Program, programs);
+            await queryRunner.commitTransaction();
+            return programs;
+        }catch(error){
+            if(queryRunner.isTransactionActive){
+                await queryRunner.rollbackTransaction();
+            }
+            this.handleException(error);
+        }finally{
+            await queryRunner.release();
+        }
+    }
 }
